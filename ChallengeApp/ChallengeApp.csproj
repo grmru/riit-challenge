@@ -7,15 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="App\**" />
-    <Content Remove="App\**" />
-    <EmbeddedResource Remove="App\**" />
-    <None Remove="App\**" />
+    <PackageReference Include="Npgsql" Version="7.0.10" />
   </ItemGroup>
-
-  <ItemGroup>
-    <None Include="wwwroot\index.js" />
-  </ItemGroup>
-
 
 </Project>

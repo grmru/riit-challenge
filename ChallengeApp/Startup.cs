@@ -9,8 +9,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using TestApp.Data;
 
-namespace WebApplication_webapi
+namespace TestApp
 {
     public class Startup
     {
@@ -24,6 +25,9 @@ namespace WebApplication_webapi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddScoped<IItemsRepository>(provider => 
+                new ItemsRepository(Configuration.GetConnectionString("DefaultConnection")));
+
             services.AddControllers();
         }
 
@@ -33,7 +37,6 @@ namespace WebApplication_webapi
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                //app.UseWebpackDevMiddleware();
             }
 
             app.UseDefaultFiles();

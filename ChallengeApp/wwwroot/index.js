@@ -1,5 +1,9 @@
-﻿$(() => {
-    $('#gridContainer').dxDataGrid({
+﻿DevExpress.localization.locale(navigator.language);
+
+$(() => {
+    let selectedRowIndex = -1;
+
+    const grid = $('#gridContainer').dxDataGrid({
         // dataSource: {
         //     store: {
         //         type: 'odata',
@@ -14,13 +18,65 @@
         //     },
         // },
         dataSource: new DevExpress.data.CustomStore({
-            key: "date",
+            key: "itemNumber",
             loadMode: "raw", // omit in the DataGrid, TreeList, PivotGrid, and Scheduler
             load: function() {
-                return $.getJSON("/WeatherForecast")
+                return $.getJSON("/api/Items")
                     .fail(function() { throw "Data loading error" });
+            },
+            insert: function(values) {
+                var deferred = $.Deferred();
+                $.ajax({
+                    url: "/api/Items",
+                    method: "POST",
+                    data: JSON.stringify(values),
+                    dataType: 'json',
+                    contentType: 'application/json',
+                })
+                .done(deferred.resolve)
+                .fail(function(e){
+                    deferred.reject("Insertion failed");
+                });
+                return deferred.promise();
+            },
+            remove: function(key) {
+                var deferred = $.Deferred();
+                $.ajax({
+                    url: "/api/Items/" + encodeURIComponent(key),
+                    method: "DELETE",
+                    dataType: 'json',
+                    contentType: 'application/json',
+                })
+                .done(deferred.resolve)
+                .fail(function(e){
+                    deferred.reject("Deletion failed");
+                })
+                return deferred.promise();
+            },
+            update: function(key, values) {
+                var deferred = $.Deferred();
+                $.ajax({
+                    url: "/api/Items/" + encodeURIComponent(key),
+                    method: "PUT",
+                    data: JSON.stringify(values),
+                    dataType: 'json',
+                    contentType: 'application/json',
+                })
+                .done(deferred.resolve)
+                .fail(function(e){
+                    deferred.reject("Update failed");
+                })
+                return deferred.promise();
             }
         }),
+        editing: {
+            mode: "popup",
+            allowUpdating: true,
+            allowDeleting: true,
+            allowAdding: true,
+            useIcons: true
+        },
+        selection: { mode: "single" },
         paging: {
             pageSize: 10,
         },
@@ -28,6 +84,9 @@
             visible: true,
             showPageSizeSelector: true,
             allowedPageSizes: [10, 25, 50, 100],
+        },
+        onRowDblClick(e) {
+            e.component.editRow(e.rowIndex);
         },
         remoteOperations: false,
         searchPanel: {
@@ -44,62 +103,22 @@
         width: '100%',
         columns: [
             {
-                dataField: 'date',
-                dataType: 'date',
-            },
-            {
-                dataField: 'temperatureC',
-                dataType: 'number',
-                alignment: 'right',
-            },
-            {
-                dataField: 'temperatureF',
-                dataType: 'number',
-                alignment: 'right',
-            },
-            {
-                dataField: 'summary',
+                dataField: 'itemNumber',
                 dataType: 'string',
+            },
+            {
+                dataField: 'itemName',
+                dataType: 'string',
+            },
+            {
+                dataField: 'itemTypeId',
+                dataType: 'number',
+            },
+            {
+                dataField: 'roomNumber',
+                dataType: 'number',
             }
         ],
-        onContentReady(e) {
-            if (!collapsed) {
-                collapsed = true;
-                e.component.expandRow(['EnviroCare']);
-            }
-        },
     });
 });
 
-const discountCellTemplate = function (container, options) {
-    $('<div/>').dxBullet({
-        onIncidentOccurred: null,
-        size: {
-            width: 150,
-            height: 35,
-        },
-        margin: {
-            top: 5,
-            bottom: 0,
-            left: 5,
-        },
-        showTarget: false,
-        showZeroLevel: true,
-        value: options.value * 100,
-        startScaleValue: 0,
-        endScaleValue: 100,
-        tooltip: {
-            enabled: true,
-            font: {
-                size: 18,
-            },
-            paddingTopBottom: 2,
-            customizeTooltip() {
-                return { text: options.text };
-            },
-            zIndex: 5,
-        },
-    }).appendTo(container);
-};
-
-let collapsed = false;
