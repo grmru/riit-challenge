@@ -28,6 +28,8 @@ $(() => {
         sort: "itemTypeId"
     }
 
+    let popupMode = 'creating'; // 'creating', 'editing'
+
     const grid = $('#gridContainer').dxDataGrid({
         dataSource: store = new DevExpress.data.CustomStore({
             key: "itemNumber",
@@ -91,7 +93,21 @@ $(() => {
             allowUpdating: true,
             allowDeleting: true,
             allowAdding: true,
-            useIcons: true
+            useIcons: true,
+            form: {
+                //items:
+                //[
+                //    {dataField: 'itemNumber'},
+                //    {dataField: 'itemName'},
+                //    {dataField: 'itemTypeId'},
+                //    {dataField: 'roomNumber'}
+                //],
+                onInitialized(e) {
+                    const f = e.component;
+                    f.itemOption("itemNumber", "disabled", popupMode === 'editing' ? true : false);
+                    console.log('form init');
+                }
+            }
         },
         selection: { mode: "single" },
         paging: {
@@ -104,6 +120,12 @@ $(() => {
         },
         onRowDblClick(e) {
             e.component.editRow(e.rowIndex);
+        },
+        onInitNewRow(e) {
+            popupMode = 'creating';
+        },
+        onEditingStart(e) {
+            popupMode = 'editing';
         },
         remoteOperations: false,
         searchPanel: {
@@ -130,7 +152,7 @@ $(() => {
                         max: 32,
                         message: 'Идентификатор не может быть больше 32 символа',
                     }
-                ]
+                ],
             },
             {
                 caption: 'Наименование',
