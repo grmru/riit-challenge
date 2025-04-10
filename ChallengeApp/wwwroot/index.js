@@ -1,22 +1,19 @@
 ﻿DevExpress.localization.locale(navigator.language);
 
 $(() => {
-    let selectedRowIndex = -1;
+
+    var lookupItemTypesDataSource = {
+        store: new DevExpress.data.CustomStore({
+            key: "itemTypeId",
+            loadMode: "raw",
+            load: function() {
+                return $.getJSON("/api/ItemTypes");
+            }
+        }),
+        sort: "itemTypeId"
+    }
 
     const grid = $('#gridContainer').dxDataGrid({
-        // dataSource: {
-        //     store: {
-        //         type: 'odata',
-        //         version: 2,
-        //         url: 'https://js.devexpress.com/Demos/SalesViewer/odata/DaySaleDtoes',
-        //         key: 'Id',
-        //         beforeSend(request) {
-        //             const year = new Date().getFullYear() - 1;
-        //             request.params.startDate = `${year}-05-10`;
-        //             request.params.endDate = `${year}-5-15`;
-        //         },
-        //     },
-        // },
         dataSource: store = new DevExpress.data.CustomStore({
             key: "itemNumber",
             loadMode: "raw", // omit in the DataGrid, TreeList, PivotGrid, and Scheduler
@@ -108,20 +105,53 @@ $(() => {
         width: '100%',
         columns: [
             {
+                caption: 'Учетный номер',
                 dataField: 'itemNumber',
                 dataType: 'string',
+                validationRules: [
+                    { type: "required" },
+                    {
+                        type: 'stringLength',
+                        max: 32,
+                        message: 'Идентификатор не может быть больше 32 символа',
+                    }
+                ]
             },
             {
+                caption: 'Наименование',
                 dataField: 'itemName',
                 dataType: 'string',
+                validationRules: [
+                    { type: "required" },
+                    {
+                        type: 'stringLength',
+                        max: 256,
+                        message: 'Наименование не может быть больше 256 символа',
+                    }]
             },
             {
+                caption: "Тип техники",
                 dataField: 'itemTypeId',
                 dataType: 'number',
+                lookup: {
+                    dataSource: lookupItemTypesDataSource,
+                    valueExpr: "itemTypeId",
+                    displayExpr: "itemTypeName"
+                },
+                validationRules: [{ type: "required" }]
             },
             {
+                caption: 'Комната размещения',
                 dataField: 'roomNumber',
                 dataType: 'number',
+                validationRules: [
+                    { type: "required" },
+                    {
+                        type: 'range',
+                        min: 1,
+                        max: 1000,
+                        message: 'Номер помещения должен быть в промежутке между 1 и 1000',
+                    }]
             }
         ],
     });

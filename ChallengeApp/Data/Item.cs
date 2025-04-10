@@ -13,7 +13,7 @@ namespace TestApp.Data
         public string ItemName { get; set; }
 
         [Required]
-        public string ItemTypeId { get; set; }
+        public int ItemTypeId { get; set; }
 
         [Required]
         [Range(1, 1000)]

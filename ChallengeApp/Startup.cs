@@ -28,6 +28,9 @@ namespace TestApp
             services.AddScoped<IItemsRepository>(provider => 
                 new ItemsRepository(Configuration.GetConnectionString("DefaultConnection")));
 
+            services.AddScoped<IItemTypesRepository>(provider => 
+                new ItemTypesRepository(Configuration.GetConnectionString("DefaultConnection")));
+
             services.AddControllers();
         }
 

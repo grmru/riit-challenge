@@ -32,7 +32,7 @@ namespace TestApp.Data
                         {
                             ItemNumber = reader.GetString(0),
                             ItemName = reader.GetString(1),
-                            ItemTypeId = reader.GetString(2),
+                            ItemTypeId = reader.GetInt32(2),
                             RoomNumber = reader.GetInt32(3)
                         });
                     }
@@ -62,7 +62,7 @@ namespace TestApp.Data
                             {
                                 ItemNumber = reader.GetString(0),
                                 ItemName = reader.GetString(1),
-                                ItemTypeId = reader.GetString(2),
+                                ItemTypeId = reader.GetInt32(2),
                                 RoomNumber = reader.GetInt32(3)
                             };
                         }
