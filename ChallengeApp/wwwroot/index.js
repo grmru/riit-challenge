@@ -28,6 +28,19 @@ $(() => {
         sort: "itemTypeId"
     }
 
+    const sendUnicValidationCheckRequest = function (id) {
+        const d = $.Deferred();
+        $.getJSON(`/api/Items/${id}`, (data) => {
+            d.resolve(!data);
+        })
+        .fail(function(jqXHR) {
+            if (jqXHR.status == 404) {
+                d.resolve(true)
+            }
+        });
+        return d.promise();
+    };
+
     let popupMode = 'creating'; // 'creating', 'editing'
 
     const grid = $('#gridContainer').dxDataGrid({
@@ -151,6 +164,13 @@ $(() => {
                         type: 'stringLength',
                         max: 32,
                         message: 'Идентификатор не может быть больше 32 символа',
+                    },
+                    {
+                        type: 'async',
+                        message: 'Идентификатор должен быть уникальным',
+                        validationCallback(params) {
+                          return sendUnicValidationCheckRequest(params.value);
+                        }
                     }
                 ],
             },
