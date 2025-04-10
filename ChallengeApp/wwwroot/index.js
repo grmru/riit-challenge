@@ -8,6 +8,21 @@ $(() => {
             loadMode: "raw",
             load: function() {
                 return $.getJSON("/api/ItemTypes");
+            },
+            insert: function(values) {
+                var deferred = $.Deferred();
+                $.ajax({
+                    url: "/api/ItemTypes",
+                    method: "POST",
+                    data: JSON.stringify(values),
+                    dataType: 'json',
+                    contentType: 'application/json',
+                })
+                .done(deferred.resolve)
+                .fail(function(e){
+                    deferred.reject("Insertion failed");
+                });
+                return deferred.promise();
             }
         }),
         sort: "itemTypeId"
