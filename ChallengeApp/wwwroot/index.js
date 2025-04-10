@@ -17,7 +17,7 @@ $(() => {
         //         },
         //     },
         // },
-        dataSource: new DevExpress.data.CustomStore({
+        dataSource: store = new DevExpress.data.CustomStore({
             key: "itemNumber",
             loadMode: "raw", // omit in the DataGrid, TreeList, PivotGrid, and Scheduler
             load: function() {
@@ -55,18 +55,23 @@ $(() => {
             },
             update: function(key, values) {
                 var deferred = $.Deferred();
-                $.ajax({
-                    url: "/api/Items/" + encodeURIComponent(key),
-                    method: "PUT",
-                    data: JSON.stringify(values),
-                    dataType: 'json',
-                    contentType: 'application/json',
-                })
-                .done(deferred.resolve)
-                .fail(function(e){
-                    deferred.reject("Update failed");
-                })
-                return deferred.promise();
+                store.byKey(key).done(
+                    (item) => {
+                        item = {...item, ...values};
+                        console.log(`item.itemName=${item.itemName}`);
+                        $.ajax({
+                            url: "/api/Items/" + encodeURIComponent(item.itemNumber),
+                            method: "PUT",
+                            data: JSON.stringify(item),
+                            dataType: 'json',
+                            contentType: 'application/json',
+                        })
+                        .done(deferred.resolve)
+                        .fail(function(e){
+                            deferred.reject("Update failed");
+                        })
+                        return deferred.promise();
+                    });          
             }
         }),
         editing: {

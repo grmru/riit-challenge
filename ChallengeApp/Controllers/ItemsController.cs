@@ -34,8 +34,8 @@ namespace TestApp.Controllers
         [HttpPost]
         public async Task<ActionResult<Item>> Post(Item item)
         {
-            //if (!ModelState.IsValid)
-            //    return BadRequest(ModelState);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             await _repository.Add(item);
             return CreatedAtAction(nameof(Get), new { id = item.ItemNumber }, item);
@@ -44,11 +44,11 @@ namespace TestApp.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(string id, Item item)
         {
-            //if (id != item.ItemNumber)
-            //    return BadRequest();
+            if (id != item.ItemNumber)
+                return BadRequest();
 
-            //if (!ModelState.IsValid)
-            //    return BadRequest(ModelState);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             var existingItem = await _repository.GetById(id);
             if (existingItem == null)
