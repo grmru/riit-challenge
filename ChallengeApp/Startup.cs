@@ -37,6 +37,8 @@ namespace TestApp
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            InitializeDatabase(app);
+            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -53,6 +55,23 @@ namespace TestApp
             {
                 endpoints.MapControllers();
             });
+        }
+
+        private void InitializeDatabase(IApplicationBuilder app)
+        {
+            using var scope = app.ApplicationServices.CreateScope();
+            var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+            var initializer = new DatabaseInitializer(config);
+            
+            try
+            {
+                initializer.InitializeAsync().GetAwaiter().GetResult();
+            }
+            catch (Exception ex)
+            {
+                var logger = scope.ServiceProvider.GetRequiredService<ILogger<Startup>>();
+                logger.LogError(ex, "Database initialization failed");
+            }
         }
     }
 }
