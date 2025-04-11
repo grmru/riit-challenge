@@ -72,6 +72,34 @@ namespace TestApp.Data
             }
         }
 
+        public async Task<bool> ValidateItemNumber(string itemNumber)
+        {
+            bool ret = false;
+            using (var connection = new NpgsqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+                using (var cmd = new NpgsqlCommand(
+                    "SELECT count(*) "+
+                    "FROM Items "+
+                    "WHERE ItemNumber = @id", 
+                    connection))
+                {
+                    cmd.Parameters.AddWithValue("id", itemNumber);
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            int count = reader.GetInt32(0);
+                            if (count > 0) { ret = false; }
+                            else { ret = true; }
+                        }
+                    }
+                }
+            }
+            return ret;
+        }
+
         public async Task Add(Item item)
         {
             using (var connection = new NpgsqlConnection(_connectionString))

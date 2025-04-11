@@ -30,12 +30,10 @@ $(() => {
 
     const sendUnicValidationCheckRequest = function (id) {
         const d = $.Deferred();
-        $.getJSON(`/api/Items/${id}`, (data) => {
-            d.resolve(!data);
-        })
-        .fail(function(jqXHR) {
-            if (jqXHR.status == 404) {
-                d.resolve(true)
+        $.getJSON(`/api/Items/valid/${id}`, (result) => {
+            if (result) { d.resolve(); }
+            else { if (popupMode === 'creating') { d.reject(); }
+                   else { d.resolve(); }
             }
         });
         return d.promise();
@@ -108,18 +106,9 @@ $(() => {
             allowAdding: true,
             useIcons: true,
             form: {
-                //items:
-                //[
-                //    {dataField: 'itemNumber'},
-                //    {dataField: 'itemName'},
-                //    {dataField: 'itemTypeId'},
-                //    {dataField: 'roomNumber'}
-                //],
-                onInitialized(e) {
-                    const f = e.component;
-                    f.itemOption("itemNumber", "disabled", popupMode === 'editing' ? true : false);
-                    console.log('form init');
-                }
+                //onInitialized(e) {
+                //    e.component.itemOption("itemNumber", "disabled", popupMode === 'editing' ? true : false);
+                //}
             }
         },
         selection: { mode: "single" },
@@ -166,10 +155,15 @@ $(() => {
                         message: 'Идентификатор не может быть больше 32 символа',
                     },
                     {
+                        type: "pattern",
+                        pattern: /^[A-Za-z0-9]+$/,
+                        message: "Учетный номер должен состоять из цифр и латинских букв",
+                    },                        
+                    {
                         type: 'async',
                         message: 'Идентификатор должен быть уникальным',
                         validationCallback(params) {
-                          return sendUnicValidationCheckRequest(params.value);
+                            return sendUnicValidationCheckRequest(params.value);
                         }
                     }
                 ],

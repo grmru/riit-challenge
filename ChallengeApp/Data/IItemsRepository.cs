@@ -7,6 +7,7 @@ namespace TestApp.Data
     {
         Task<IEnumerable<Item>> GetAll();
         Task<Item> GetById(string itemNumber);
+        Task<bool> ValidateItemNumber(string itemNumber);
         Task Add(Item item);
         Task Update(Item item);
         Task Delete(string itemNumber);

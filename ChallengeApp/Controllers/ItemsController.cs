@@ -31,6 +31,13 @@ namespace TestApp.Controllers
             return Ok(item);
         }
 
+        [HttpGet("valid/{id}")]
+        public async Task<ActionResult<bool>> GetValid(string id)
+        {
+            var result = await _repository.ValidateItemNumber(id);
+            return Ok(result);
+        }
+
         [HttpPost]
         public async Task<ActionResult<Item>> Post(Item item)
         {
