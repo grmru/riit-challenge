@@ -51,8 +51,8 @@ namespace TestApp.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(string id, Item item)
         {
-            if (id != item.ItemNumber)
-                return BadRequest();
+            //if (id != item.ItemNumber)
+            //    return BadRequest();
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -61,8 +61,9 @@ namespace TestApp.Controllers
             if (existingItem == null)
                 return NotFound();
 
+            item.ItemNumber = id;
             await _repository.Update(item);
-            return NoContent();
+            return Ok();
         }
 
         [HttpDelete("{id}")]

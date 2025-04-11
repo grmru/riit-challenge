@@ -91,7 +91,7 @@ $(() => {
                             dataType: 'json',
                             contentType: 'application/json',
                         })
-                        .done(deferred.resolve)
+                        .done((result) => { deferred.resolve(); })
                         .fail(function(e){
                             deferred.reject("Update failed");
                         })
@@ -106,9 +106,10 @@ $(() => {
             allowAdding: true,
             useIcons: true,
             form: {
-                //onInitialized(e) {
-                //    e.component.itemOption("itemNumber", "disabled", popupMode === 'editing' ? true : false);
-                //}
+                onInitialized(e) {
+                    //e.component.itemOption("itemNumber", "disabled", popupMode === 'editing' ? true : false);
+                    e.component.itemOption("itemNumber", "visible", popupMode === 'editing' ? false : true);
+                }
             }
         },
         selection: { mode: "single" },
@@ -205,6 +206,28 @@ $(() => {
                     }]
             }
         ],
+        onContextMenuPreparing: function (e) {
+            if (e.row.rowType === "data") {
+                e.items = [{
+                    text: "Редактировать",
+                    onItemClick: function () {
+                        e.component.editRow(e.row.rowIndex);
+                    }
+                },
+                {
+                    text: "Добавить",
+                    onItemClick: function () {
+                        e.component.addRow();
+                    }
+                },
+                {
+                    text: "Удалить",
+                    onItemClick: function () {
+                        e.component.deleteRow(e.row.rowIndex);
+                    }
+                }];
+            }
+        }
     });
 });
 
